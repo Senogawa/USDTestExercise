@@ -1,5 +1,5 @@
 from aiogram import Dispatcher, Bot
-from aiogram.contrib.fsm_storage.memory import MemoryStorage
+from aiogram.fsm.storage.memory import MemoryStorage
 import asyncio
 
 from loader import bot_meta
