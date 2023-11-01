@@ -1,20 +1,20 @@
 from aiogram import Dispatcher, Bot
-from aiogram.fsm.storage.memory import MemoryStorage
+from aiogram.contrib.fsm_storage.memory import MemoryStorage
 import asyncio
 
-from loader import bot_meta
+from loader import usdBotCnf
+from handlers.usdHandlers import register_usdbot_handlers
 
-bot = Bot(bot_meta.token)
-dp = Dispatcher(bot, storage = MemoryStorage())
+usdBot = Bot(token = usdBotCnf["usdToken"])
+usdDp = Dispatcher(usdBot, storage = MemoryStorage())
 
-
-
+register_usdbot_handlers(usdDp)
 
 async def bot_start_pooling():
     try:
-        await dp.start_polling()
+        await usdDp.start_polling()
     finally:
-        dp.storage.close()
+        usdDp.storage.close()
 
 
 
