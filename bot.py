@@ -8,6 +8,8 @@ from handlers.usdHandlers import register_usdbot_handlers
 usdBot = Bot(token = usdBotCnf["usdToken"])
 usdDp = Dispatcher(usdBot, storage = MemoryStorage())
 
+#TODO добавить проверку на наличие базы
+
 register_usdbot_handlers(usdDp)
 
 async def bot_start_pooling():
