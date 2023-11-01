@@ -14,6 +14,8 @@ async def start_handler(message: types.Message):
         """,
         reply_markup = UsdKeyboards.mainKeyboard
     )
+    #TODO проверка на наличие пользователя в базе
+    await BotStates.main_menu.set()
 
 
 def register_all_start_handlers(dp: Dispatcher):
