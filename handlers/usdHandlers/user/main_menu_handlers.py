@@ -6,13 +6,17 @@ from keyboards.KeyboardsClass import UsdKeyboards
 from aiohttp import ClientConnectorError
 
 from middlewares.usdBotSoftware.usdCourse import get_usd_course
+from orm.usdBot.database_work import Database
 
 
 
 async def main_menu_handler(message: types.Message, state: FSMContext):
+    database = Database("test_db.db")
+
     if message.text == "Узнать текущий курс":
         try:
             course = await get_usd_course()
+            database.add_new_course_history(message.from_id, course)
             await message.answer(f"Текущий курс доллара: {course} RUB")
 
         except ClientConnectorError as ex:
@@ -22,8 +26,13 @@ async def main_menu_handler(message: types.Message, state: FSMContext):
         return
 
     if message.text == "Подписаться на получение курса":
-        ...
-        #TODO Изменить у пользователя в базе значение получение курса на True
+        database.change_notifications_status(message.from_id, True)
+        await message.answer("Вы подписались на переодическое получение курса доллара", reply_markup = UsdKeyboards.mainKeyboardWithSub)
+        return
+
+    if message.text == "Отписаться от получения курса":
+        database.change_notifications_status(message.from_id, False)
+        await message.answer("Вы отписались от переодического получения курса доллара", reply_markup = UsdKeyboards.mainKeyboard)
         return
 
     if message.text == "История получения курса":

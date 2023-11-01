@@ -64,6 +64,21 @@ class Database:
 
             logger.info(f"Состояние подписки {user_id} обновлено на {notifications_status}")
 
+    def check_subscribe_for_notifications(self, user_id: int) -> bool:
+        """
+        Проверка на наличие подписки для рассылки
+        """
+
+        with self.engine.connect() as conn:
+            users = Table("users", self.meta)
+            query = select(users).where(users.c.user_id == user_id)
+
+            result = conn.execute(query).fetchall()
+            if result[0][2]:
+                return True
+            
+            return False
+
     def get_users_with_notifications(self) -> list:
         """
         Получение списка пользователей с включенной рассылкой
@@ -118,14 +133,15 @@ class Database:
 
 
 
-database = Database("test_db.db")
+#database = Database("test_db.db")
 
 def __main():
     database = Database("test_db.db")
     #database.add_new_course_history(111122, "93.76")
     #database.get_course_history(111122)
     #print(database.check_user_in_database(11112))
-    print(database.get_users_with_notifications())
+    #print(database.get_users_with_notifications())
+    print(database.check_subscribe_for_notifications(1081181910))
 
 if __name__ == "__main__":
     __main()
