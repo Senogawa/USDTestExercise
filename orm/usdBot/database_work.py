@@ -5,6 +5,7 @@ from orm.usdBot.models import base
 from logger_settings import logger
 import time
 import numpy as np
+from sqlalchemy.exc import OperationalError
 
 
 class Database:
@@ -87,9 +88,21 @@ class Database:
 
         with self.engine.connect() as conn:
             users = Table("users", self.meta)
+
+            query_for_check_users_count = select(users)
+            try:
+                users_count = len(conn.execute(query_for_check_users_count).fetchall())
+
+            except OperationalError:
+                return list()
+
+            if not users_count:
+                return list()
+
             query = select(users).where(users.c.notifications == True)
 
             result = conn.execute(query).fetchall()
+            result = [user[1] for user in result]
             
         return result
 
@@ -126,6 +139,9 @@ class Database:
         """
 
         with self.engine.connect() as conn:
+            if f"{user_id}_courses" not in self.meta.tables:
+                return list()
+
             users_table = Table(f"{user_id}_courses", self.meta)
             query = select(users_table)
             result = conn.execute(query).fetchall()

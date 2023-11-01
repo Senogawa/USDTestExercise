@@ -4,6 +4,9 @@ import asyncio
 
 from loader import usdBotCnf
 from handlers.usdHandlers import register_usdbot_handlers
+from middlewares.usdBotSoftware.schdule_newsletter import start_scheduler
+
+from threading import Thread
 
 usdBot = Bot(token = usdBotCnf["usdToken"])
 usdDp = Dispatcher(usdBot, storage = MemoryStorage())
@@ -11,6 +14,7 @@ usdDp = Dispatcher(usdBot, storage = MemoryStorage())
 #TODO добавить проверку на наличие базы
 
 register_usdbot_handlers(usdDp)
+Thread(target = start_scheduler, args = (usdBot,), daemon = True).start()
 
 async def bot_start_pooling():
     try:
