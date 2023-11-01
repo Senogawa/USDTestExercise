@@ -4,6 +4,7 @@ from sqlalchemy import insert, select, update, Table, Column, Integer, String
 from orm.usdBot.models import base
 from logger_settings import logger
 import time
+import numpy as np
 
 
 class Database:
@@ -127,9 +128,43 @@ class Database:
         with self.engine.connect() as conn:
             users_table = Table(f"{user_id}_courses", self.meta)
             query = select(users_table)
-            result = conn.execute(query)
+            result = conn.execute(query).fetchall()
             
-        return result.fetchall()
+        reversed_result = sorted(result, reverse = True)
+
+        courses_history = list()
+
+        if len(reversed_result) == 0:
+            return courses_history
+
+        if len(reversed_result) <= 5:
+            courses_history.append(reversed_result)
+            return courses_history
+        
+        course_page = list()
+        while True:
+            if len(reversed_result) > 5:
+                for i in range(0, 5):
+                    course_page.append(reversed_result[i])
+                    #print(course_page)
+
+                courses_history.append(course_page)
+                #print(courses_history)
+
+                for i in range(0, 5):
+                    reversed_result.pop(0)
+
+                course_page = list()
+
+            if len(reversed_result) <= 5 and len(reversed_result) != 0:
+                courses_history.append(reversed_result)
+                break
+
+            if len(reversed_result) == 0:
+                break
+
+        return courses_history
+        
 
 
 
@@ -138,10 +173,10 @@ class Database:
 def __main():
     database = Database("test_db.db")
     #database.add_new_course_history(111122, "93.76")
-    #database.get_course_history(111122)
+    print(database.get_course_history(1081181910))
     #print(database.check_user_in_database(11112))
     #print(database.get_users_with_notifications())
-    print(database.check_subscribe_for_notifications(1081181910))
+    #print(database.check_subscribe_for_notifications(1081181910))
 
 if __name__ == "__main__":
     __main()

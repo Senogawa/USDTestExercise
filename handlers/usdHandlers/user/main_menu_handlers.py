@@ -36,8 +36,30 @@ async def main_menu_handler(message: types.Message, state: FSMContext):
         return
 
     if message.text == "История получения курса":
-        ...
-        #TODO отправить inline сообщение
+        courses_history = database.get_course_history(message.from_id)
+        len_indexes_courses_history = len(courses_history) - 1
+        if not len(courses_history):
+            await message.answer("Вы не проверяли курс доллара")
+            return
+        
+        if len(courses_history) == 1:
+            text_message = ""
+            for course in courses_history[0]:
+                text_message += f"Курс доллара {course[2]} | {course[1]}\n"
+            
+            await message.answer(text_message)
+            return
+        
+        inline_keyboard = types.InlineKeyboardMarkup(1).add(
+            types.InlineKeyboardButton("->", callback_data = f"next:1:{len_indexes_courses_history}")
+        )
+
+        text_message = ""
+        for course in courses_history[0]:
+            text_message += f"Курс доллара {course[2]} | {course[1]}\n"
+
+        await message.answer(text_message, reply_markup = inline_keyboard)
+
         return
     
     await message.answer("Нет такого варианта ответа")
